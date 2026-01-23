@@ -3,16 +3,19 @@ package com.shaper.CashFlow.Services;
 import com.shaper.CashFlow.Models.UserModel;
 import com.shaper.CashFlow.Repositories.UsersRepo;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@NoArgsConstructor
 @AllArgsConstructor
-public class UsersServices {
 
-    private final UsersRepo usersRepo;
+public class UsersServices {
+    @Autowired
+    private UsersRepo usersRepo;
 
     public List<UserModel> getAllUsers(){
         return  this.usersRepo.findAll();
