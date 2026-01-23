@@ -17,7 +17,7 @@ public class TransactionModel {
 
     private double amount;
 
-    private LocalDateTime date = LocalDateTime.now();
+    private LocalDateTime transactionDate = LocalDateTime.now(); //changed to be same name as a DTO
 
     @ManyToOne
     @JoinColumn(name = "user_id")
