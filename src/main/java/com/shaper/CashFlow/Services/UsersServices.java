@@ -70,6 +70,7 @@ public class UsersServices {
     //Login
     public UserDto.BasicResponse login(UserDto.LoginRequest request){
         String cleanEmail = request.getEmail().trim().toLowerCase();
+
         UserModel user = UsersRepo.email(cleanEmail).
                 orElseThrow(() -> new RuntimeException("Invalid credentails"));
 
