@@ -7,11 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,10 +41,10 @@ public class UsersServices {
     }
 
     // I use optional to avoid Nullable Exception
-    public UserDto.WithTransactionResponse getUserByEmail(String email){
+    public Optional<UserDto.WithTransactionResponse> getUserByEmail(String email){
         String cleanEmail = email.trim().toLowerCase();
-        UserModel user = UsersRepo.email(cleanEmail).orElseThrow(() -> new RuntimeException("NOT FOUND"));
-        return  UserDto.toWithTransaction(user);
+        UserModel user = usersRepo.findByEmail(cleanEmail).orElseThrow(()-> new RuntimeException("The Email("+email+") doesn't Exist"));
+        return Optional.of(UserDto.toWithTransaction(user));
     }
 
 
@@ -53,7 +53,7 @@ public class UsersServices {
     public UserDto.BasicResponse addUser(UserDto.CreateRequest request){
         //check if the email exist
         String cleanEmail = request.getCleanEmail();
-        if(UsersRepo.email(cleanEmail).isPresent()){
+        if(usersRepo.findByEmail(cleanEmail).isPresent()){
             throw  new RuntimeException("Email already exists");
         }
 
@@ -78,7 +78,7 @@ public class UsersServices {
     public UserDto.BasicResponse login(UserDto.LoginRequest request){
         String cleanEmail = request.getEmail().trim().toLowerCase();
 
-        UserModel user = UsersRepo.email(cleanEmail).
+        UserModel user = usersRepo.findByEmail(cleanEmail).
                 orElseThrow(() -> new RuntimeException("Invalid credentails"));
 
         //check the corresponding password

@@ -3,6 +3,7 @@ package com.shaper.CashFlow.DTO.user;
 import com.shaper.CashFlow.Models.TransactionModel;
 import com.shaper.CashFlow.Models.UserModel;
 import lombok.Data;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,13 +20,17 @@ public class UserDto {
 
     @Data
     public static class CreateRequest{
-        //@NoBlank(message = "Email is required")
         private String email;
         private String password;
 
-        //clean email
+        // Clean email
         public String getCleanEmail(){
-            return email  != null ? email.trim().toLowerCase() :null;
+            return email != null ? email.trim().toLowerCase() : null;
+        }
+
+        // Get encrypted password (to be called in service)
+        public String getEncryptedPassword(PasswordEncoder passwordEncoder) {
+            return passwordEncoder.encode(this.password);
         }
     }
 

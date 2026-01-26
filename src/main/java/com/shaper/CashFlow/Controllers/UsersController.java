@@ -1,12 +1,12 @@
 package com.shaper.CashFlow.Controllers;
 
 import com.shaper.CashFlow.DTO.user.UserDto;
-import com.shaper.CashFlow.Models.UserModel;
 import com.shaper.CashFlow.Services.UsersServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -31,11 +31,11 @@ public class UsersController {
      }
 
      @GetMapping("/email")
-     public  UserDto.WithTransactionResponse getUserByEmail(@RequestParam String email){
+     public  Optional<UserDto.WithTransactionResponse> getUserByEmail(@RequestParam String email){
          return this.usersServices.getUserByEmail(email);
     }
 
-     @PostMapping
+     @PostMapping("/register")
     public UserDto.BasicResponse  addUser(@RequestBody UserDto.CreateRequest user){
          return  this.usersServices.addUser(user);
      }
