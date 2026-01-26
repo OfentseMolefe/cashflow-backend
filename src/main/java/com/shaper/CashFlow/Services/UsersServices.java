@@ -39,14 +39,14 @@ public class UsersServices {
 
     // I use optional to avoid Nullable Exception
     public UserDto.WithTransactionResponse getUserByEmail(String email){
-             String cleanEmail = email.trim().toLowerCase();
-             UserModel user = UsersRepo.email(cleanEmail).orElseThrow(() -> new RuntimeException("NOT FOUND"));
-            return  UserDto.toWithTransaction(user);
+        String cleanEmail = email.trim().toLowerCase();
+        UserModel user = UsersRepo.email(cleanEmail).orElseThrow(() -> new RuntimeException("NOT FOUND"));
+        return  UserDto.toWithTransaction(user);
     }
 
 
     // Create a user
-   @Transactional
+    @Transactional
     public UserDto.BasicResponse addUser(UserDto.CreateRequest request){
         //check if the email exist
         String cleanEmail = request.getCleanEmail();
@@ -83,8 +83,8 @@ public class UsersServices {
             throw new RuntimeException("Invalid credentails");
         }
         /*
-        * For future Reference After the authentication create a token for the user *
-        *  */
+         * For future Reference After the authentication create a token for the user *
+         *  */
         return UserDto.toBasicResponse(user);
     }
 

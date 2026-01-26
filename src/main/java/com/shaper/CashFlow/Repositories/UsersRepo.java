@@ -8,5 +8,11 @@ import java.util.Optional;
 
 @Repository
 public interface UsersRepo extends JpaRepository<UserModel, Long> {
-   static Optional<UserModel> email(String email);
+    static Optional<UserModel> email(String email) {
+        try {
+            return Optional.empty();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

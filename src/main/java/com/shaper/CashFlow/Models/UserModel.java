@@ -32,4 +32,5 @@ public class UserModel {
 
 
     private LocalDateTime create_at = LocalDateTime.now(); // to get the current date and time stamp
+
 }

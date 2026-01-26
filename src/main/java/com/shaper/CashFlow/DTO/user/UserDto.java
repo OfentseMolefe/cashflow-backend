@@ -14,8 +14,8 @@ public class UserDto {
 
     //========Request DTO=========//
     /*
-    * Create New User Request
-    * */
+     * Create New User Request
+     * */
 
     @Data
     public static class CreateRequest{
@@ -30,7 +30,7 @@ public class UserDto {
     }
 
     // For update the user
-  @Data
+    @Data
     public static class UpdateRequest{
         private  String email,password;
 
@@ -66,7 +66,7 @@ public class UserDto {
 
 
     //====== Mappers / Helper Methods =========//
-     /*
+    /*
      *  Convert the UserModel to BasicResponse
      * */
     public static  BasicResponse toBasicResponse (UserModel user){
@@ -80,8 +80,8 @@ public class UserDto {
 
 
     /*
-    * Convert UserModel to WithTransactionsResponse
-    * */
+     * Convert UserModel to WithTransactionsResponse
+     * */
     public static  WithTransactionResponse toWithTransaction (UserModel user){
         WithTransactionResponse dto = new WithTransactionResponse();
         dto.setId(user.getId());
