@@ -4,6 +4,9 @@ import com.shaper.CashFlow.DTO.user.UserDto;
 import com.shaper.CashFlow.Models.UserModel;
 import com.shaper.CashFlow.Repositories.UsersRepo;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,11 +15,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@NoArgsConstructor
 @AllArgsConstructor
 public class UsersServices {
 
-    private final UsersRepo usersRepo;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private  UsersRepo usersRepo;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     //get all users
     public List<UserDto.BasicResponse> getAllUsers(){
@@ -53,7 +60,7 @@ public class UsersServices {
         //Create the user and save
         UserModel user = new UserModel();
         user.setEmail(cleanEmail);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
 
         return  UserDto.toBasicResponse(usersRepo.save(user));
     }
@@ -75,7 +82,7 @@ public class UsersServices {
                 orElseThrow(() -> new RuntimeException("Invalid credentails"));
 
         //check the corresponding password
-        if(!passwordEncoder.matches(request.getPassword(),user.getPassword())){
+        if(!bCryptPasswordEncoder.matches(request.getPassword(),user.getPassword())){
             throw new RuntimeException("Invalid credentails");
         }
         /*
