@@ -1,0 +1,109 @@
+Subject: [PATCH] Uncommitted changes before Update at 2026/01/26, 08:41 [Changes]
+---
+Index: src/main/java/com/shaper/CashFlow/Services/UsersServices.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/shaper/CashFlow/Services/UsersServices.java b/src/main/java/com/shaper/CashFlow/Services/UsersServices.java
+--- a/src/main/java/com/shaper/CashFlow/Services/UsersServices.java	(revision 7e884e3a7529bc6421a1810c81b5939a1738e230)
++++ b/src/main/java/com/shaper/CashFlow/Services/UsersServices.java	(date 1769408910210)
+@@ -1,13 +1,17 @@
+ package com.shaper.CashFlow.Services;
+ 
++import com.shaper.CashFlow.DTO.user.UserDto;
+ import com.shaper.CashFlow.Models.UserModel;
+ import com.shaper.CashFlow.Repositories.UsersRepo;
+ import lombok.AllArgsConstructor;
+ import lombok.NoArgsConstructor;
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.security.crypto.password.PasswordEncoder;
+ import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
+ 
+ import java.util.List;
++import java.util.stream.Collectors;
+ 
+ @Service
+ @NoArgsConstructor
+@@ -16,22 +20,72 @@
+ public class UsersServices {
+     @Autowired
+     private UsersRepo usersRepo;
++    private  PasswordEncoder passwordEncoder;
+ 
+-    public List<UserModel> getAllUsers(){
+-        return  this.usersRepo.findAll();
++    //get all users
++    public List<UserDto.BasicResponse> getAllUsers(){
++        return  usersRepo.findAll()
++                .stream()
++                .map(UserDto::toBasicResponse)
++                .collect(Collectors.toList());
+     }
+ 
+-    public UserModel getUserById(Long id){
+-        return this.usersRepo.findById(id).orElseThrow(() -> new RuntimeException("The user("+id+") doesn't Exist"));
++    // Get user by ID
++    public UserDto.BasicResponse getUserById(Long id){
++        UserModel user = this.usersRepo.findById(id).
++                orElseThrow(() -> new RuntimeException("The user("+id+") doesn't Exist"));
++        return UserDto.toBasicResponse(user);
+     }
+ 
+     // I use optional to avoid Nullable Exception
+-    public UserModel getUserByEmail(String email){
+-            return this.usersRepo.email(email).orElseThrow(() -> new RuntimeException("NOT FOUND"));
++    public UserDto.WithTransactionResponse getUserByEmail(String email){
++             String cleanEmail = email.trim().toLowerCase();
++             UserModel user = UsersRepo.email(cleanEmail).orElseThrow(() -> new RuntimeException("NOT FOUND"));
++            return  UserDto.toWithTransaction(user);
++    }
++
++
++    // Create a user
++   @Transactional
++    public UserDto.BasicResponse addUser(UserDto.CreateRequest request){
++        //check if the email exist
++        String cleanEmail = request.getCleanEmail();
++        if(UsersRepo.email(cleanEmail).isPresent()){
++            throw  new RuntimeException("Email already exists");
++        }
++
++        //Create the user and save
++        UserModel user = new UserModel();
++        user.setEmail(cleanEmail);
++        user.setPassword(passwordEncoder.encode(request.getPassword()));
++
++        return  UserDto.toBasicResponse(usersRepo.save(user));
++    }
++
++    // Delete user
++    @Transactional
++    public void deleteUser(Long id) {
++        if (!usersRepo.existsById(id)) {
++            throw new RuntimeException("User not found");
++        }
++        usersRepo.deleteById(id);
+     }
+ 
+-    public UserModel addUser(UserModel user){
+-        return this.usersRepo.save(user);
++    //Login
++    public UserDto.BasicResponse login(UserDto.LoginRequest request){
++        String cleanEmail = request.getEmail().trim().toLowerCase();
++
++        UserModel user = UsersRepo.email(cleanEmail).
++                orElseThrow(() -> new RuntimeException("Invalid credentails"));
++
++        //check the corresponding password
++        if(!passwordEncoder.matches(request.getPassword(),user.getPassword())){
++            throw new RuntimeException("Invalid credentails");
++        }
++        /*
++        * For future Reference After the authentication create a token for the user *
++        *  */
++        return UserDto.toBasicResponse(user);
+     }
+ 
+ 
